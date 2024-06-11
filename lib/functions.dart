@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class APIService {
-  static const String baseURL = 'http:localhostlalalalala';
+  static const String baseURL = 'http://51.79.105.168:8160/';
 
   static Future<Map<String, dynamic>> fetchSitio(String id) async {
     final response = await http.post(
-      Uri.parse('$baseURL/getsitio'),
+      Uri.parse('${baseURL}getsitio'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -22,7 +22,7 @@ class APIService {
 
   // FUNCION PARA OBTENER SITIOS
   static Future<List<dynamic>> fetchSitios() async {
-    final response = await http.post(Uri.parse('$baseURL/sitios'));
+    final response = await http.post(Uri.parse('${baseURL}sitios'));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       return data['sitios'];
@@ -34,7 +34,7 @@ class APIService {
   // FUNCION PARA INICIAR SESION
   static Future<Map<String, dynamic>> login(String username, String password) async {
     final response = await http.post(
-      Uri.parse('$baseURL/login'),
+      Uri.parse('${baseURL}login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -51,10 +51,10 @@ class APIService {
     }
   }
 
-  // FUNCION PARA INICIAR SESION
+  // FUNCION PARA REGISTRARSE
   static Future<Map<String, dynamic>> register(String username, String name, String password) async {
     final response = await http.post(
-      Uri.parse('$baseURL/register'),
+      Uri.parse('${baseURL}register'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

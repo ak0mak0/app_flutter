@@ -5,7 +5,6 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'principal.dart';
-import 'loggin.dart';
 
 class QRScreen extends StatefulWidget {
   const QRScreen({Key? key}) : super(key: key);
@@ -40,7 +39,6 @@ class _QRScreenState extends State<QRScreen> {
   Widget build(BuildContext context) {
     Color oscuro = Color.fromARGB(142, 0, 0, 0);
     double extra_top = MediaQuery.of(context).padding.top;
-    double extra_bottom = MediaQuery.of(context).padding.bottom;
     double ancho = MediaQuery.of(context).size.width.toDouble();
     double altura = MediaQuery.of(context).size.height.toDouble() - extra_top;
 
@@ -197,6 +195,7 @@ class _QRScreenState extends State<QRScreen> {
       if (!_isScanned) {
         setState(() {
           _isScanned = true;
+          qrData = scanData.code ?? "";
         });
         // Aquí puedes manejar los datos del código QR escaneado
         print('Scanned data: ${scanData.code}');
@@ -210,10 +209,8 @@ class _QRScreenState extends State<QRScreen> {
     });
 
     try {
-      // Asume que scanData es un string que contiene el ID
-      String scannedData = _qrcontroller.toString();
-      print(scannedData);
-      final sitioData = await APIService.fetchSitio(scannedData);
+      // Asume que qrData es un string que contiene el ID
+      final sitioData = await APIService.fetchSitio(qrData);
       // Manejar la respuesta afirmativa
       Navigator.pushReplacement(
         context,
