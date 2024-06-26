@@ -4,10 +4,11 @@ import 'package:front/pages/sitio.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'principal.dart';
 
 class QRScreen extends StatefulWidget {
-  const QRScreen({Key? key}) : super(key: key);
+  final String user_id;
+
+  const QRScreen({super.key, required this.user_id});
 
   @override
   _QRScreenState createState() => _QRScreenState();
@@ -27,9 +28,11 @@ class _QRScreenState extends State<QRScreen> {
     // Configuración de la interfaz de usuario del sistema
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-        statusBarColor: Color.fromRGBO(0, 0, 0, 0),  // Color de la barra de estado
+        statusBarColor:
+            Color.fromRGBO(0, 0, 0, 0), // Color de la barra de estado
         statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Color.fromARGB(255, 0, 0, 0), // Color de la barra de navegación
+        systemNavigationBarColor:
+            Color.fromARGB(255, 0, 0, 0), // Color de la barra de navegación
         systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
@@ -45,12 +48,10 @@ class _QRScreenState extends State<QRScreen> {
     return Scaffold(
       body: Stack(
         children: [
-
           QRView(
             key: _qrKey,
             onQRViewCreated: _onQRViewCreated,
           ),
-
           Column(
             children: [
               Container(
@@ -58,7 +59,6 @@ class _QRScreenState extends State<QRScreen> {
                 width: ancho,
                 color: oscuro,
               ),
-              
               Container(
                 alignment: Alignment.center,
                 height: altura * 0.08,
@@ -87,7 +87,6 @@ class _QRScreenState extends State<QRScreen> {
                   ],
                 ),
               ),
-              
               Container(
                 alignment: Alignment.center,
                 color: oscuro,
@@ -102,7 +101,6 @@ class _QRScreenState extends State<QRScreen> {
                       fontWeight: FontWeight.w400),
                 ),
               ),
-              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -118,7 +116,6 @@ class _QRScreenState extends State<QRScreen> {
                   ),
                 ],
               ),
-              
               Expanded(
                 child: Container(
                   alignment: Alignment.center,
@@ -130,20 +127,22 @@ class _QRScreenState extends State<QRScreen> {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-
                         Container(
                           width: ancho * 0.25,
                           height: ancho * 0.25,
                           decoration: BoxDecoration(
-                            color: Color.fromARGB(81, 205, 205, 205), // Fondo transparente
+                            color: Color.fromARGB(
+                                81, 205, 205, 205), // Fondo transparente
                             border: Border.all(
-                                color: Colors.white, width: ancho * 0.005), // Borde blanco
-                            borderRadius: BorderRadius.circular(50), // Esquinas redondeadas
+                                color: Colors.white,
+                                width: ancho * 0.005), // Borde blanco
+                            borderRadius: BorderRadius.circular(
+                                50), // Esquinas redondeadas
                           ),
                         ),
-
                         AnimatedContainer(
-                          duration: Duration(milliseconds: 500), // Duración de la animación
+                          duration: Duration(
+                              milliseconds: 500), // Duración de la animación
                           width: ancho * 0.215,
                           height: ancho * 0.215,
                           decoration: BoxDecoration(
@@ -151,23 +150,31 @@ class _QRScreenState extends State<QRScreen> {
                                 ? Colors.grey
                                 : _isScanned
                                     ? Color.fromRGBO(60, 195, 110, 1)
-                                    : Color.fromRGBO(224, 121, 98, 1), // Cambia el color basado en _isScanned
+                                    : Color.fromRGBO(224, 121, 98,
+                                        1), // Cambia el color basado en _isScanned
                             border: Border.all(
-                                color: Colors.white, width: ancho * 0.005), // Borde blanco
-                            borderRadius: BorderRadius.circular(50), // Esquinas redondeadas
+                                color: Colors.white,
+                                width: ancho * 0.005), // Borde blanco
+                            borderRadius: BorderRadius.circular(
+                                50), // Esquinas redondeadas
                           ),
                           child: _isLoading
                               ? CircularProgressIndicator(
-                                  valueColor:
-                                      AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
                                 )
                               : ElevatedButton(
-                                  onPressed: _isScanned ? _fetchSitioData : null,
+                                  onPressed: _isScanned
+                                      ? () => _registerSitioVisit(
+                                          widget.user_id, qrData)
+                                      : null,
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all<Color>(
-                                        Colors.transparent), // Fondo del botón transparente
-                                    shadowColor: MaterialStateProperty.all<Color>(
-                                        Colors.transparent), // Eliminar sombra
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(Colors
+                                            .transparent), // Fondo del botón transparente
+                                    shadowColor:
+                                        MaterialStateProperty.all<Color>(Colors
+                                            .transparent), // Eliminar sombra
                                   ),
                                   child: Icon(
                                     Icons.search,
@@ -203,32 +210,36 @@ class _QRScreenState extends State<QRScreen> {
     });
   }
 
-  Future<void> _fetchSitioData() async {
+  Future<void> _registerSitioVisit(String userId, String qrData) async {
+    print(userId);
+    print(qrData);
     setState(() {
       _isLoading = true;
     });
 
     try {
       // Asume que qrData es un string que contiene el ID
-      final sitioData = await APIService.fetchSitio(qrData);
-      // Manejar la respuesta afirmativa
+      await APIService.registerVisit(userId, qrData); // Registrando la visita
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Sitio(sitioData: sitioData)),
+        MaterialPageRoute(
+            builder: (context) => Sitio(
+                  user_id: userId,
+                  sitio_id: qrData,
+                  estado: true,
+                )),
       );
     } catch (e) {
       // Manejar la respuesta negativa
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Principal()),
-      );
+      print(e);
+      // Aquí puedes mostrar un diálogo de error, una Snackbar, etc.
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
   }
-  
+
   @override
   void dispose() {
     _qrcontroller?.dispose();
